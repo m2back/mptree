@@ -9,11 +9,16 @@ export default function PlayerPage({ togglePlaylistShow }) {
     const [shuffle, setShuffle] = useState(player.getShuffle());
     const [repeat, setRepeat] = useState(player.getRepeat());
     const [cover, setCover] = useState(player.getCover());
-
-    console.log("Player Page Is Loading");
+    const [showSongDetail, setShowSongDetail] = useState(true);
+    const [songName, setSongName] = useState(player.getSongName());
+    const [artistName, setArtistName] = useState(player.getArtistName());
 
     const toggleLyric = () => {
         setLyricsShow((prevShow) => !prevShow);
+    };
+
+    const toggleShowSongDetail = () => {
+        setShowSongDetail((prevShow) => !prevShow);
     };
 
     player.audio.addEventListener("play", () => {
@@ -24,10 +29,15 @@ export default function PlayerPage({ togglePlaylistShow }) {
     });
     player.audio.addEventListener("loadedmetadata", () => {
         setCover(player.getCover());
+        setSongName(player.getSongName());
+        setArtistName(player.getArtistName());
+        setRepeat(player.getRepeat());
     });
     player.audio.addEventListener("srccleared", () => {
         setCover("images/coversample.jpg");
         setIsPlaying(false);
+        setSongName(player.getSongName());
+        setArtistName(player.getArtistName());
     });
     player.audio.addEventListener("shuffle", () => {
         setShuffle(player.getShuffle());
@@ -51,6 +61,23 @@ export default function PlayerPage({ togglePlaylistShow }) {
                             className="other-button button"
                             onClick={togglePlaylistShow}
                         />
+
+                        <div
+                            className="playerpage-songdetail button"
+                            onClick={toggleShowSongDetail}
+                        >
+                            {showSongDetail && (
+                                <>
+                                    <p className="playerpage-songname">
+                                        {songName}
+                                    </p>
+                                    <p className="playerpage-artistname">
+                                        {artistName}
+                                    </p>
+                                </>
+                            )}
+                        </div>
+
                         <img
                             onClick={toggleLyric}
                             src="./images/lyrics.png"

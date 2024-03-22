@@ -2,7 +2,7 @@ import * as mm from "music-metadata-browser";
 import { md5 } from "js-md5";
 
 /* ---------------Initializing Default Values----------------- */
-let initialPlaylist = [];
+let originalPlaylist = [];
 let playlist = [];
 let currentSongId = null;
 let shuffleMode = false;
@@ -38,21 +38,20 @@ const getSongDetail = async (file) => {
     try {
         const fileURL = URL.createObjectURL(file);
         const metadata = await mm.parseBlob(file);
-        let imageURL = null;
-        if (metadata.common.picture && metadata.common.picture.length > 0) {
-            const pictureData = metadata.common.picture[0];
-            const base64String = btoa(
-                String.fromCharCode(...new Uint8Array(pictureData.data))
-            );
-            imageURL = `data:${pictureData.format};base64,${base64String}`;
-        }
+        const pictureData = metadata.common.picture[0];
+        const imageBlob = new Blob([pictureData.data], {
+            type: pictureData.format,
+        });
+        let imageURL = URL.createObjectURL(imageBlob);
         return {
             id: md5(file.name),
             name: file.name.split(".").slice(0, -1).join("."),
             address: fileURL,
-            title: metadata.common.title,
-            artist: metadata.common.artist,
-            album: metadata.common.album,
+            title:
+                metadata.common.title ||
+                file.name.split(".").slice(0, -1).join("."),
+            artist: metadata.common.artist || "Unknown Artist",
+            album: metadata.common.album || "Unknown Album",
             cover: imageURL,
         };
     } catch (e) {
@@ -87,7 +86,7 @@ const parsLyric = (text) => {
     }
 
     for (let i = 0; i < lyrics.length - 1; i++) {
-        lyrics[i].end = lyrics[i + 1].start - 0.01;
+        lyrics[i].end = lyrics[i + 1].start;
     }
 
     return lyrics;
@@ -131,18 +130,18 @@ audio.addEventListener("ended", () => {
 // Initializing
 
 export const initialPlayer = () => {
-    if (initialPlaylist) {
-        playlist = [...initialPlaylist];
+    if (originalPlaylist) {
+        playlist = [...originalPlaylist];
         setAudio(0);
     }
 };
 
 const playlistChange = () => {
-    if (initialPlaylist?.length >= 0) {
+    if (originalPlaylist?.length >= 0) {
         if (!shuffleMode) {
-            playlist = shuffleArray([...initialPlaylist]);
+            playlist = shuffleArray([...originalPlaylist]);
         } else {
-            playlist = [...initialPlaylist];
+            playlist = [...originalPlaylist];
             playlist = shuffleArray(playlist);
         }
     }
@@ -151,29 +150,28 @@ const playlistChange = () => {
 // Playlist Options
 
 export const getPlaylist = () => {
-    return initialPlaylist;
+    return originalPlaylist;
 };
 
 export const setList = (list) => {
-    initialPlaylist = list;
+    originalPlaylist = list;
     playlistChange();
     audio.dispatchEvent(new Event("playlistchange"));
     audio.dispatchEvent(new Event("listloaded"));
 };
 
 export const appendList = (list) => {
-    initialPlaylist = initialPlaylist.concat(
+    originalPlaylist = originalPlaylist.concat(
         list.filter(
-            (item2) => !initialPlaylist.find((item1) => item1.id === item2.id)
+            (item2) => !originalPlaylist.find((item1) => item1.id === item2.id)
         )
     );
-    // initialPlaylist = initialPlaylist.concat(list);
     playlistChange();
     audio.dispatchEvent(new Event("playlistchange"));
 };
 
 export const clearList = () => {
-    initialPlaylist = [];
+    originalPlaylist = [];
     playlistChange();
     audio.src = "";
     audio.dispatchEvent(new Event("playlistchange"));
@@ -185,32 +183,55 @@ export const clearList = () => {
 export const getSongListFromFiles = async (files) => {
     try {
         const fileList = Array.from(files);
-        const songListPromise = await fileList.map((file) => {
-            if (file.name.endsWith(".mp3" || ".ogg" || ".m4a")) {
-                return getSongDetail(file);
-            } else if (file.name.endsWith(".lrc")) {
-                return getLyricsFromFile(file);
+        const musicDataPromises = fileList.map(async (file) => {
+            if (
+                file.name.endsWith(".mp3") ||
+                file.name.endsWith(".ogg") ||
+                file.name.endsWith(".m4a")
+            ) {
+                return await getSongDetail(file);
             }
+            return null;
         });
 
-        let songList = await Promise.all(songListPromise);
-        let mergedArray = {};
+        const lyricDataPromises = fileList.map(async (file) => {
+            if (file.name.endsWith(".lrc")) {
+                return await getLyricsFromFile(file);
+            }
+            return null;
+        });
 
+        //getting music data and lyric after that
+        const musicData = await Promise.all(musicDataPromises);
+        const lyricData = await Promise.all(lyricDataPromises);
+
+        //filtering out empty items
+        const songList = [
+            ...musicData.filter(Boolean),
+            ...lyricData.filter(Boolean),
+        ];
+
+        //merging music and lyric with name of them
+        const mergedArray = {};
         songList.forEach((item) => {
-            if (mergedArray[item.name]) {
-                Object.assign(mergedArray[item.name], item);
-            } else {
-                mergedArray[item.name] = item;
+            if (item !== null) {
+                if (mergedArray[item.name]) {
+                    Object.assign(mergedArray[item.name], item);
+                } else {
+                    mergedArray[item.name] = item;
+                }
             }
         });
-        songList = Object.values(mergedArray);
 
-        // deleting Lyrics only items
-        songList = songList.filter((item) => item.id);
-        return songList;
+        //removing lyric only item
+        const filteredSongList = Object.values(mergedArray).filter(
+            (item) => item.id
+        );
+        return filteredSongList;
     } catch (e) {
         console.log("Failed to get Files from list");
         console.log(e.message);
+        throw e;
     }
 };
 
@@ -244,7 +265,7 @@ export const next = () => {
     } else {
         setAudio(0);
     }
-    repeatMode === "single" ? (repeatMode = "off") : null;
+    repeatMode === "single" ? (repeatMode = "all") : null;
 };
 
 export const prev = () => {
@@ -261,10 +282,10 @@ export const prev = () => {
 export const toggleShuffle = () => {
     if (!shuffleMode) {
         shuffleMode = true;
-        playlist = shuffleArray([...initialPlaylist]);
+        playlist = shuffleArray([...originalPlaylist]);
     } else {
         shuffleMode = false;
-        playlist = [...initialPlaylist];
+        playlist = [...originalPlaylist];
     }
 };
 
@@ -285,7 +306,7 @@ export const seek = (time) => {
 };
 
 export const getLyrics = () => {
-    const song = initialPlaylist.find((song) => {
+    const song = originalPlaylist.find((song) => {
         return song.id === currentSongId && song.lyric;
     });
     if (song) {
@@ -317,5 +338,23 @@ export const getCover = () => {
         return playlist[currentSongIndex].cover;
     } else {
         return "/images/samplecover.jpg";
+    }
+};
+
+export const getSongName = () => {
+    const currentSongIndex = playlist.findIndex((song) => {
+        return song.id === currentSongId;
+    });
+    if (playlist[currentSongIndex]) {
+        return playlist[currentSongIndex].title;
+    }
+};
+
+export const getArtistName = () => {
+    const currentSongIndex = playlist.findIndex((song) => {
+        return song.id === currentSongId;
+    });
+    if (playlist[currentSongIndex]) {
+        return playlist[currentSongIndex].artist;
     }
 };

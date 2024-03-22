@@ -50,11 +50,19 @@
     background-color: #131313;
     opacity: 0.9;
     aspect-ratio: 1;
-    margin-top: 48px;
+    margin-top: 69px;
     border-radius: 15px;
     padding: 15px;
     color: wheat;
     overflow-y: scroll;
+}
+.lyrics-page::-webkit-scrollbar {
+    display: none;
+}
+
+.lyrics-page {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 .music-controls {
@@ -74,8 +82,12 @@
 }
 
 .other-button {
+    min-height: 23px;
+    max-height: 23px;
+    min-width: 23px;
     max-width: 23px;
     margin: 0 15px;
+    align-self: center;
 }
 
 .cover-plus {
@@ -121,6 +133,9 @@
 }
 .entry-artist {
     color: rgb(224, 18, 53);
+}
+.entry-album {
+    color: #e69c70ed;
 }
 
 .playlist-end {
@@ -314,4 +329,29 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+.playerpage-songname {
+    color: white;
+    font-weight: 700;
+    max-width: 100%;
+    max-height: 50%;
+    display: ruby;
+    transition: ease 0.5s;
+}
+.playerpage-artistname {
+    color: rgb(224, 18, 53);
+    max-width: 100%;
+    display: ruby;
+    transition: ease 0.5s;
+    max-height: 50%;
+}
+
+.playerpage-songdetail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 190px;
+    height: 44px;
 }

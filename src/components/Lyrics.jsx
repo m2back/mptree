@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as player from "./Player";
 
 export default function Lyrics() {
-    const [lyrics, setLyrics] = useState(null);
+    const [lyrics, setLyrics] = useState(player.getLyrics());
     const [activeIndex, setActiveIndex] = useState(-1);
     const lyricsRef = useRef(null);
 
@@ -48,7 +48,7 @@ export default function Lyrics() {
                         key={index}
                         className="lyric-p button"
                         style={{
-                            color: active ? "red" : "wheat",
+                            color: active ? "#5cceae" : "wheat",
                             fontSize: active && "1.3em",
                             paddingTop: active && "7px",
                             paddingBottom: active && "7px",
