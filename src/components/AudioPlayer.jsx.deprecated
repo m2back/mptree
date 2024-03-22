@@ -1,0 +1,168 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useEffect, useRef, useState } from "react";
+
+export default function audioPlayer() {
+    console.log("Audio Player jsx running");
+    //Setting up Player
+    const [songList, setSongList] = useState([]);
+    const [currentSong, setCurrentSong] = useState(songList[0]);
+    const [lyricPageVisibility, setLyricPageVisibility] = useState(false);
+    const [playlistPageVisibility, setPlaylistPageVisibility] = useState(false);
+
+    // Creating a refrence for audioPlayer
+    const audioRef = useRef();
+
+    // Initializing Default State of Player Options
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [repeat, SetRepeat] = useState(false);
+    const [shuffle, SetShuffle] = useState(false);
+    const [duration, setDuration] = useState(0);
+    const [currentTime, setCurrentTime] = useState(0);
+
+    useEffect(() => {
+        //Setting up Event Listeners to change State of Player
+        audioRef.current.addEventListener("play", () => {
+            setIsPlaying(true);
+        });
+
+        audioRef.current.addEventListener("pause", () => {
+            setIsPlaying(false);
+        });
+
+        audioRef.current.addEventListener("onloadedmetadata", () => {
+            if (audioRef) {
+                setDuration(audioRef.current.duration);
+            }
+        });
+        audioRef.current.addEventListener("ontimeupdate", () => {
+            if (audioRef.current) {
+                setCurrentTime((audioPlayer.currentTime / duration) * 100);
+            }
+        });
+
+        //Creating a Basic Function for Controlling Player
+        const changeAudio = (newSource, newid) => {
+            setCurrentSong({
+                file: newSource,
+                id: newid,
+            });
+        };
+
+        const togglePlayPause = () => {
+            isPlaying ? audioRef.current.pause() : audioRef.current.play();
+        };
+
+        const toggleRepeat = () => {
+            SetRepeat((prevRepeat) => !prevRepeat);
+            audioRef.current.loop = !audioRef.current.loop;
+        };
+
+        const toggleShuffle = () => {
+            SetShuffle((prevShuffle) => !prevShuffle);
+        };
+
+        const seekTo = (time) => {
+            const now = (duration * time) / 100;
+            audioPlayer.currentTime = now;
+        };
+
+        const next = () => {
+            const currentSongIndex = songList.findIndex((song) => {
+                song.id === song.id;
+            });
+            if (shuffle) {
+                const randomNumber = Math.floor(
+                    Math.random() * songList.length
+                );
+                setCurrentSong((oldSrc) => {
+                    oldSrc.id = songList[randomNumber].id;
+                    oldSrc.file = songList[randomNumber].url;
+                });
+            } else {
+                if (currentSongIndex !== songList.length) {
+                    setCurrentSong((oldSrc) => {
+                        oldSrc.file = songList[currentSongIndex + 1].url;
+                        oldSrc.id = songList[currentSongIndex + 1].id;
+                    });
+                } else {
+                    setCurrentSong((oldSrc) => {
+                        oldSrc.file = songList[0].url;
+                        oldSrc.id = songList[0].id;
+                    });
+                }
+            }
+        };
+
+        const prev = () => {
+            const currentSongIndex = songList.findIndex((song) => {
+                song.id === song.id;
+            });
+            if (shuffle) {
+                const randomNumber = Math.floor(
+                    Math.random() * songList.length
+                );
+                setCurrentSong((oldSrc) => {
+                    oldSrc.id = songList[randomNumber].id;
+                    oldSrc.file = songList[randomNumber].url;
+                });
+            } else {
+                if (currentSongIndex !== 0) {
+                    setCurrentSong((oldSrc) => {
+                        oldSrc.file = songList[currentSongIndex + 1].url;
+                        oldSrc.id = songList[currentSongIndex + 1].id;
+                    });
+                } else {
+                    setCurrentSong((oldSrc) => {
+                        oldSrc.file = songList[songList.length].url;
+                        oldSrc.id = songList[songList.length].id;
+                    });
+                }
+            }
+        };
+
+        //Creating Toggles for Changing Visibility of Player Pages
+        const togglePlaylistPage = () => {
+            setPlaylistPageVisibility((prevVisibility) => !prevVisibility);
+        };
+
+        const toggleLyricPage = () => {
+            setLyricPageVisibility((prevVisibility) => !prevVisibility);
+        };
+
+        // List All Basic Functions in One Player Control Object
+        const playerControl = {
+            changeAudio,
+            togglePlayPause,
+            toggleRepeat,
+            toggleShuffle,
+            next,
+            prev,
+            seekTo,
+        };
+
+        //List All Player Status in One Player Status Object
+        const playerStatus = {
+            shuffle,
+            repeat,
+        };
+
+        //List All Player Pages Visibility Option in One Player Pages Object
+        const playerPages = {
+            toggleLyricPage,
+            togglePlaylistPage,
+        };
+    }, []);
+
+    return (
+        <>
+            <audio
+                src={currentSong.url}
+                controls
+                autoPlay={isPlaying}
+                // style={{ display: "none" }}
+                ref={audioRef}
+            />
+        </>
+    );
+}

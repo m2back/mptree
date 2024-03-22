@@ -1,0 +1,317 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Madimi+One&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Vazirmatn:wght@100..900&display=swap");
+
+* {
+    margin: 0;
+    overflow: hidden;
+    font-family: Nunito, sans-serif;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.main-window {
+    background-color: #151515;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.playerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    max-width: 300px;
+    height: 750px;
+}
+
+.cover-continer {
+    width: 300px;
+    height: 300px;
+    border-radius: 15px;
+    aspect-ratio: 1;
+}
+.cover-image {
+    aspect-ratio: 1;
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    border-radius: 15px;
+}
+
+.lyrics-page {
+    position: absolute;
+    width: 270px;
+    height: 270px;
+    background-color: #131313;
+    opacity: 0.9;
+    aspect-ratio: 1;
+    margin-top: 48px;
+    border-radius: 15px;
+    padding: 15px;
+    color: wheat;
+    overflow-y: scroll;
+}
+
+.music-controls {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.control-button {
+    max-width: 20px;
+}
+
+.other-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.other-button {
+    max-width: 23px;
+    margin: 0 15px;
+}
+
+.cover-plus {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.playlist {
+    height: 550px;
+    width: 300px;
+    background-color: #090808;
+    border-radius: 10px;
+    overflow: scroll;
+    padding: 0 10px;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+.entry-container {
+    background-color: #131313;
+    display: flex;
+    max-height: 64px;
+    padding: 6px;
+    justify-content: center;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.entry-cover {
+    flex: 2;
+}
+.entry-details {
+    flex: 6;
+    color: white;
+    padding-left: 10px;
+    margin: auto;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.entry-cover-image {
+    max-height: 100%;
+    border-radius: 10px;
+}
+.entry-artist {
+    color: rgb(224, 18, 53);
+}
+
+.playlist-end {
+    color: aliceblue;
+    font-weight: 900;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 20px;
+}
+.playlist-end span {
+    color: red;
+}
+.playlist-start {
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    position: sticky;
+    top: 0px;
+    background-color: #090808;
+    width: 100%;
+    height: 50px;
+}
+.playlist-start span {
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    padding: 8px;
+    border-radius: 5px;
+    font-weight: 800;
+}
+.playlist-start span:hover {
+    background-color: rgb(25, 25, 25);
+    cursor: pointer;
+    transition: ease 0.5s;
+}
+.playlist-start label {
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    padding: 8px;
+    border-radius: 5px;
+    font-weight: 800;
+}
+.playlist-start label:hover {
+    background-color: rgb(25, 25, 25);
+    cursor: pointer;
+    transition: ease 0.5s;
+}
+.playlist-start img {
+    margin: 0;
+    padding: 13px;
+    border-radius: 5px;
+    font-weight: 800;
+    display: none;
+}
+.main-center-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.main-left-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+.main-right-container {
+    width: 100%;
+}
+
+@media (max-width: 1000px) {
+    .main-left-container,
+    .main-right-container {
+        width: unset;
+    }
+    .main-center-container {
+        flex: 1;
+    }
+    .main-left-container {
+        margin-left: 50px;
+    }
+}
+
+@media (max-width: 775px) {
+    .playlist {
+        height: 475px;
+        width: 300px;
+        min-width: 100%;
+        height: 100vh;
+    }
+    .playerContainer {
+        width: 100%;
+        min-height: 100vh;
+    }
+    .playlist-start label {
+        margin: 0;
+        margin-top: 5px;
+    }
+    .playlist-start span {
+        margin: 0;
+        margin-top: 5px;
+    }
+    .playlist-start img {
+        display: flex;
+    }
+    .playlist {
+        /* display: none; */
+        z-index: 1;
+        margin: 30px;
+    }
+    .main-center-container {
+        flex: unset;
+        width: 100vw;
+        position: fixed;
+    }
+    .main-left-container {
+        width: 100vw;
+        margin-left: 50px;
+        display: flex;
+        justify-content: center;
+        min-width: 100%;
+        min-height: 100vh;
+    }
+}
+
+.open-windows {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #151515;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+.open-button {
+    display: none;
+}
+.open-button-holder {
+    background-color: rgb(59, 59, 59);
+    padding: 20px 35px;
+    color: white;
+    display: block;
+    border-radius: 8px;
+    border-bottom: solid rgb(255, 255, 255);
+    border-right: solid rgb(255, 255, 255);
+    background-image: url("./images/music-note.png");
+    background-repeat: no-repeat;
+    background-size: 20%;
+    background-position: 125px 22px;
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+.progress-bar {
+    height: 7px;
+    border-radius: 35px;
+    width: 90%;
+}
+.progress-bar-background {
+    background-color: rgb(202, 203, 204);
+    width: 100%;
+    height: 100%;
+}
+
+.progress-bar progress {
+    width: 100%;
+}
+.progress-bar-fill {
+    height: 100%;
+    background-color: #e01235;
+}
+
+.lyric-p {
+    text-align: center;
+    font-family: Nunito, Vazirmatn;
+}
+.loading {
+    font-size: 2.5rem;
+    font-family: "Madimi One";
+    color: #29baa6;
+    padding-right: 7px;
+}
+
+.loading-continer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
