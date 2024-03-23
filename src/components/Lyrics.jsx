@@ -6,31 +6,38 @@ export default function Lyrics() {
     const [activeIndex, setActiveIndex] = useState(-1);
     const lyricsRef = useRef(null);
 
-    player.audio.addEventListener("loadedmetadata", () => {
-        setLyrics(player.getLyrics());
-    });
+    useEffect(() => {
+        player.audio.addEventListener("loadedmetadata", () => {
+            setLyrics(player.getLyrics());
+        });
 
-    player.audio.addEventListener("srccleared", () => {
-        setLyrics(null);
-    });
+        player.audio.addEventListener("srccleared", () => {
+            setLyrics(null);
+        });
 
-    player.audio.addEventListener("timeupdate", () => {
-        const currentTime = player.audio.currentTime;
-        if (lyrics) {
-            const foundIndex = lyrics.findIndex((lyric) => {
-                if (lyric.start <= currentTime && lyric.end >= currentTime) {
-                    return true;
-                }
-            });
-            setActiveIndex(foundIndex);
-        }
-    });
+        player.audio.addEventListener("timeupdate", () => {
+            const currentTime = player.audio.currentTime;
+            if (lyrics) {
+                const foundIndex = lyrics.findIndex((lyric) => {
+                    if (
+                        lyric.start <= currentTime &&
+                        lyric.end >= currentTime
+                    ) {
+                        return true;
+                    }
+                });
+                setActiveIndex(foundIndex);
+            }
+        });
+    }, []);
 
     useEffect(() => {
-        const activeLyricElement = lyricsRef.current.children[activeIndex - 3];
+        const activeLyricElement = lyricsRef.current.children[activeIndex];
         if (activeLyricElement) {
             activeLyricElement.scrollIntoView({
                 behavior: "smooth",
+                block: "center",
+                inline: "nearest",
             });
         }
     }, [activeIndex]);
