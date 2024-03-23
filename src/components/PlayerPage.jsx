@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as player from "./Player";
 import Lyrics from "./Lyrics";
 import Progressbar from "./Progressbar";
@@ -43,6 +43,10 @@ export default function PlayerPage({ togglePlaylistShow }) {
         setShuffle(player.getShuffle());
     });
 
+    useEffect(() => {
+        document.title = `MP!Tree - ${artistName} ${songName}`;
+    }, [songName, artistName]);
+
     const togglePlayPause = () => {
         if (isPlaying) {
             player.pause();
@@ -50,6 +54,7 @@ export default function PlayerPage({ togglePlaylistShow }) {
             player.play();
         }
     };
+
     return (
         <>
             <div className="playerContainer">
