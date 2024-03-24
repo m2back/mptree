@@ -38,7 +38,14 @@ const shuffleArray = (array) => {
 };
 
 function splitArrayToChunks(arr, chunk) {
-    const chunkSize = Math.floor(arr.length / chunk);
+    let chunkSize;
+
+    if (arr.length < chunk) {
+        chunkSize = 1;
+    } else {
+        chunkSize = Math.floor(arr.length / chunk);
+    }
+
     const result = [];
 
     for (let i = 0; i < arr.length; i += chunkSize) {
