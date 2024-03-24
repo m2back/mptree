@@ -429,6 +429,6 @@ export const getArtistName = () => {
         return song.id === currentSongId;
     });
     if (playlist[currentSongIndex]) {
-        return currentSongIndex.artist;
+        return playlist[currentSongIndex].artist;
     }
 };
