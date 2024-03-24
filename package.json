@@ -15,6 +15,7 @@
     "music-metadata-browser": "^2.5.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "util": "^0.12.5"
   },
   "devDependencies": {

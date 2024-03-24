@@ -118,7 +118,23 @@
 }
 .entry-cover {
     flex: 2;
+    position: relative;
 }
+
+.entry-lyric {
+    position: absolute;
+    background-color: rgba(240, 248, 255, 0.692);
+    border-top: #090808 solid 2px;
+    border-left: #090808 solid 2px;
+    border-top-left-radius: 3px;
+    border-bottom-right-radius: 5px;
+    font-size: 0.7em;
+    padding-left: 3px;
+    padding-right: 2px;
+    bottom: 0;
+    right: 5px;
+}
+
 .entry-details {
     flex: 6;
     color: white;

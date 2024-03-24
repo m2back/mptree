@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import * as player from "./Player";
+import * as player from "../player";
 
 export default function Progressbar() {
     const [musicTime, setMusicTime] = useState(0);

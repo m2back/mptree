@@ -38,11 +38,17 @@ const getSongDetail = async (file) => {
     try {
         const fileURL = URL.createObjectURL(file);
         const metadata = await mm.parseBlob(file);
-        const pictureData = metadata.common.picture[0];
-        const imageBlob = new Blob([pictureData.data], {
-            type: pictureData.format,
-        });
-        let imageURL = URL.createObjectURL(imageBlob);
+        let imageURL;
+        if (metadata.common.picture) {
+            const pictureData = metadata.common.picture[0];
+            const imageBlob = new Blob([pictureData.data], {
+                type: pictureData.format,
+            });
+            imageURL = URL.createObjectURL(imageBlob);
+        } else {
+            imageURL = "/images/nocover.jpg";
+        }
+
         return {
             id: md5(file.name),
             name: file.name.split(".").slice(0, -1).join("."),
@@ -53,6 +59,7 @@ const getSongDetail = async (file) => {
             artist: metadata.common.artist || "Unknown Artist",
             album: metadata.common.album || "Unknown Album",
             cover: imageURL,
+            playtime: 1,
         };
     } catch (e) {
         if (

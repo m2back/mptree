@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as player from "./Player";
+import * as player from "../player";
 
 export default function SelectPage({ toggleShowPlayer }) {
     const [loading, setLoading] = useState(false);

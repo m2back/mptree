@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import * as player from "./Player";
+import * as player from "../player";
 
 export default function Lyrics() {
     const [lyrics, setLyrics] = useState(player.getLyrics());
@@ -14,7 +14,9 @@ export default function Lyrics() {
         player.audio.addEventListener("srccleared", () => {
             setLyrics(null);
         });
+    }, []);
 
+    useEffect(() => {
         player.audio.addEventListener("timeupdate", () => {
             const currentTime = player.audio.currentTime;
             if (lyrics) {
@@ -29,7 +31,8 @@ export default function Lyrics() {
                 setActiveIndex(foundIndex);
             }
         });
-    }, []);
+        console.log("UseEffect is running");
+    }, [lyrics]);
 
     useEffect(() => {
         const activeLyricElement = lyricsRef.current.children[activeIndex];
