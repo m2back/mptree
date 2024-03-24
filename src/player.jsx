@@ -5,8 +5,17 @@ import { md5 } from "js-md5";
 let originalPlaylist = [];
 let playlist = [];
 let currentSongId = null;
-let shuffleMode = false;
+let shuffleMode = "off";
 let repeatMode = "off";
+let playTimes;
+const playTimesLS = localStorage.getItem("playTimes");
+if (playTimesLS) {
+    playTimes = JSON.parse(playTimesLS);
+} else {
+    playTimes = {};
+}
+
+// console.log(playTimesLS);
 export const audio = new Audio();
 
 /* ---------------Internal Functions----------------- */
@@ -26,6 +35,44 @@ const shuffleArray = (array) => {
     }
 
     return array;
+};
+
+function splitArrayToChunks(arr, chunk) {
+    const chunkSize = Math.floor(arr.length / chunk);
+    const result = [];
+
+    for (let i = 0; i < arr.length; i += chunkSize) {
+        result.push(arr.slice(i, i + chunkSize));
+    }
+
+    return result;
+}
+
+const smartShuffle = (playlist, playTimes) => {
+    // Adding Playtime to playlist
+    const playlistWPT = playlist.map((song) => {
+        return { ...song, playtime: playTimes[song?.id] || 0 };
+    });
+
+    //Sort Playlist by Playtime
+    const sortedPlaylist = playlistWPT.sort((a, b) => b.playtime - a.playtime);
+
+    //Split Playtime by 20% of length
+    const playlistChunks = splitArrayToChunks(sortedPlaylist, 5);
+
+    //Shuffle Each section of playlist Randomly
+    const shuffledChunks = playlistChunks.map((item) => {
+        return shuffleArray(item);
+    });
+
+    //Merging all items in Playlist to be Flatten
+    const shuffledPlaylist = shuffledChunks.flat(2);
+
+    //Move Current song to top of playlist
+    shuffledPlaylist.sort((x, y) => {
+        return x.id == currentSongId ? -1 : y.id == currentSongId ? 1 : 0;
+    });
+    return shuffledPlaylist;
 };
 
 const setAudio = (index) => {
@@ -59,7 +106,6 @@ const getSongDetail = async (file) => {
             artist: metadata.common.artist || "Unknown Artist",
             album: metadata.common.album || "Unknown Album",
             cover: imageURL,
-            playtime: 1,
         };
     } catch (e) {
         if (
@@ -132,6 +178,23 @@ audio.addEventListener("ended", () => {
     }
 });
 
+setInterval(() => {
+    if (!audio.paused) {
+        if (!playTimes[currentSongId]) {
+            playTimes[currentSongId] = 0;
+        }
+        playTimes[currentSongId]++;
+    }
+}, 1000);
+
+setInterval(() => {
+    let playTimesTracker;
+    if (playTimesTracker !== playTimes) {
+        localStorage.setItem("playTimes", JSON.stringify(playTimes));
+    }
+    playTimesTracker = playTimes;
+}, 5000);
+
 /* ---------------Export Functions----------------- */
 
 // Initializing
@@ -144,12 +207,13 @@ export const initialPlayer = () => {
 };
 
 const playlistChange = () => {
-    if (originalPlaylist?.length >= 0) {
-        if (!shuffleMode) {
+    if (originalPlaylist && originalPlaylist.length > 0) {
+        if (shuffleMode === "normal") {
             playlist = shuffleArray([...originalPlaylist]);
-        } else {
+        } else if (shuffleMode === "smart") {
+            playlist = smartShuffle([...originalPlaylist], playTimes);
+        } else if (shuffleMode === "off") {
             playlist = [...originalPlaylist];
-            playlist = shuffleArray(playlist);
         }
     }
 };
@@ -287,11 +351,14 @@ export const prev = () => {
 };
 
 export const toggleShuffle = () => {
-    if (!shuffleMode) {
-        shuffleMode = true;
+    if (shuffleMode === "off") {
+        shuffleMode = "normal";
         playlist = shuffleArray([...originalPlaylist]);
-    } else {
-        shuffleMode = false;
+    } else if (shuffleMode === "normal") {
+        shuffleMode = "smart";
+        playlist = smartShuffle([...originalPlaylist], playTimes);
+    } else if (shuffleMode === "smart") {
+        shuffleMode = "off";
         playlist = [...originalPlaylist];
     }
 };
@@ -362,6 +429,6 @@ export const getArtistName = () => {
         return song.id === currentSongId;
     });
     if (playlist[currentSongIndex]) {
-        return playlist[currentSongIndex].artist;
+        return currentSongIndex.artist;
     }
 };

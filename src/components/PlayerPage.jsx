@@ -41,9 +41,6 @@ export default function PlayerPage({ togglePlaylistShow }) {
             setSongName(player.getSongName());
             setArtistName(player.getArtistName());
         });
-        player.audio.addEventListener("shuffle", () => {
-            setShuffle(player.getShuffle());
-        });
     }, []);
 
     const togglePlayPause = () => {
@@ -103,9 +100,13 @@ export default function PlayerPage({ togglePlaylistShow }) {
                 <div className="music-controls">
                     <img
                         src={
-                            shuffle
-                                ? "./images/shuffle.png"
-                                : "./images/shuffleDisable.png"
+                            shuffle == "off"
+                                ? "images/shuffleDisable.png"
+                                : shuffle == "normal"
+                                ? "/images/shuffle.png"
+                                : shuffle == "smart"
+                                ? "/images/shuffleSmart.png"
+                                : ""
                         }
                         alt="Shuffle"
                         className="control-button button"
