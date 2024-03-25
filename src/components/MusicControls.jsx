@@ -98,7 +98,7 @@ export default function MusicControls() {
                 <GrNext
                     size={size * 1.2}
                     className="button white react-icon"
-                    onClick={player.prev}
+                    onClick={player.next}
                 />
                 <span className="button" onClick={handleRepeat}>
                     {repeatIcons[repeat]}
