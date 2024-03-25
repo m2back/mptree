@@ -5,9 +5,16 @@ import playlistImage from "../images/playlist.png";
 export default function Playlist({ togglePlaylistShow }) {
     const [songList, setSongList] = useState(player.getPlaylist());
     useEffect(() => {
-        player.audio.addEventListener("playlistchange", () => {
+        const handlePlaylistchange = () => {
             setSongList(player.getPlaylist());
-        });
+        };
+        player.audio.addEventListener("playlistchange", handlePlaylistchange);
+        return () => {
+            player.audio.removeEventListener(
+                "playlistchange",
+                handlePlaylistchange
+            );
+        };
     }, []);
 
     const musicList = (list) => {

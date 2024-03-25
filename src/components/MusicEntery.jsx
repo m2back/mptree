@@ -13,9 +13,16 @@ export default function MusicEntery({
     const [active, setActive] = useState(CurrentSongId === id);
 
     useEffect(() => {
-        player.audio.addEventListener("loadedmetadata", () => {
+        const handleLoadedmetadata = () => {
             setActive(player.getCurrentSongId() === id);
-        });
+        };
+        player.audio.addEventListener("loadedmetadata", handleLoadedmetadata);
+        return () => {
+            player.audio.removeEventListener(
+                "loadedmetadata",
+                handleLoadedmetadata
+            );
+        };
     }, []);
 
     return (

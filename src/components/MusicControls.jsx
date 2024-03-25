@@ -57,18 +57,36 @@ export default function MusicControls() {
     };
 
     useEffect(() => {
-        player.audio.addEventListener("play", () => {
+        const handlePlay = () => {
             setIsPlaying(true);
-        });
-        player.audio.addEventListener("pause", () => {
+        };
+
+        const handlePause = () => {
             setIsPlaying(false);
-        });
-        player.audio.addEventListener("loadedmetadata", () => {
+        };
+
+        const handleLoadedMetadata = () => {
             setRepeat(player.getRepeat());
-        });
-        player.audio.addEventListener("srccleared", () => {
+        };
+
+        const handleSrcCleared = () => {
             setIsPlaying(false);
-        });
+        };
+
+        player.audio.addEventListener("play", handlePlay);
+        player.audio.addEventListener("pause", handlePause);
+        player.audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+        player.audio.addEventListener("srccleared", handleSrcCleared);
+        
+        return () => {
+            player.audio.removeEventListener("play", handlePlay);
+            player.audio.removeEventListener("pause", handlePause);
+            player.audio.removeEventListener(
+                "loadedmetadata",
+                handleLoadedMetadata
+            );
+            player.audio.removeEventListener("srccleared", handleSrcCleared);
+        };
     }, []);
 
     return (

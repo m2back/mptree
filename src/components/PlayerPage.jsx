@@ -24,23 +24,36 @@ export default function PlayerPage({ togglePlaylistShow }) {
     };
 
     useEffect(() => {
-        player.audio.addEventListener("loadedmetadata", () => {
+        const handleMetadata = () => {
             setCover(player.getCover());
             setSongName(player.getSongName());
             setArtistName(player.getArtistName());
             document.title = `MP!Tree - ${artistName} ${songName}`;
-        });
-        player.audio.addEventListener("srccleared", () => {
+        };
+        const handleSrccleared = () => {
             setCover(noCoverImage);
             setSongName(player.getSongName());
             setArtistName(player.getArtistName());
-        });
-        player.audio.addEventListener("play", () => {
+        };
+
+        const handlePlay = () => {
             setIsPlaying(true);
-        });
-        player.audio.addEventListener("pause", () => {
+        };
+        const handlePause = () => {
             setIsPlaying(false);
-        });
+        };
+
+        player.audio.addEventListener("loadedmetadata", handleMetadata);
+        player.audio.addEventListener("srccleared", handleSrccleared);
+        player.audio.addEventListener("play", handlePlay);
+        player.audio.addEventListener("pause", handlePause);
+
+        return () => {
+            player.audio.removeEventListener("loadedmetadata", handleMetadata);
+            player.audio.removeEventListener("srccleared", handleSrccleared);
+            player.audio.removeEventListener("play", handlePlay);
+            player.audio.removeEventListener("pause", handlePause);
+        };
     }, []);
 
     return (

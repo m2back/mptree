@@ -4,20 +4,25 @@ import * as player from "../player";
 export default function Progressbar() {
     const [musicTime, setMusicTime] = useState(0);
     useEffect(() => {
-        player.audio.addEventListener("timeupdate", () => {
+        const handleTimeupdate = () => {
             setTimeout(() => {
                 const currentTime = player.audio.currentTime;
                 const musicDuration = player.audio.duration;
                 const percent = (currentTime / musicDuration) * 100;
                 setMusicTime(percent);
             }, 500);
-        });
-
-        player.audio.addEventListener("srccleared", () => {
+        };
+        const handleSrcCleared = () => {
             setMusicTime(0);
-        });
+        };
 
-        console.log("Progress bar useeffect");
+        player.audio.addEventListener("timeupdate", handleTimeupdate);
+        player.audio.addEventListener("srccleared", handleSrcCleared);
+
+        return () => {
+            player.audio.removeEventListener("timeupdate", handleTimeupdate);
+            player.audio.removeEventListener("srccleared", handleSrcCleared);
+        };
     }, []);
 
     const setSeek = (event) => {
