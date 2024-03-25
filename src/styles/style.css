@@ -348,6 +348,7 @@
 .lyric-p {
     text-align: center;
     font-family: Nunito, Vazirmatn;
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.25s;
 }
 .loading {
     font-size: 2.5rem;

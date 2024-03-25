@@ -59,7 +59,7 @@ export default function Lyrics({ style }) {
                         className="lyric-p button"
                         style={{
                             color: active ? "#5cceae" : "wheat",
-                            fontSize: active && "1.3em",
+                            fontSize: active && "1.2em",
                             paddingTop: active && "7px",
                             paddingBottom: active && "7px",
                         }}
