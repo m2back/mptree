@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import * as player from "../player";
-
+import { RiPlayListFill } from "react-icons/ri";
 export default function MusicEntery({
     cover,
     id,
@@ -34,7 +34,11 @@ export default function MusicEntery({
                 }}
             >
                 <div className="entry-cover">
-                    {lyric && <span className="entry-lyric">Lyric</span>}
+                    {lyric && (
+                        <span className="entry-lyric">
+                            <RiPlayListFill className="white" />
+                        </span>
+                    )}
                     <img
                         src={cover}
                         alt="Mini Cover"

@@ -1,5 +1,6 @@
 import * as mm from "music-metadata-browser";
 import { md5 } from "js-md5";
+import noCoverImage from "./images/nocover.jpg";
 
 /* ---------------Initializing Default Values----------------- */
 let originalPlaylist = [];
@@ -100,7 +101,7 @@ const getSongDetail = async (file) => {
             });
             imageURL = URL.createObjectURL(imageBlob);
         } else {
-            imageURL = "/images/nocover.jpg";
+            imageURL = noCoverImage;
         }
 
         return {
@@ -418,7 +419,7 @@ export const getCover = () => {
     if (playlist[currentSongIndex]) {
         return playlist[currentSongIndex].cover;
     } else {
-        return "/images/samplecover.jpg";
+        return noCoverImage;
     }
 };
 

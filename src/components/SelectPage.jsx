@@ -1,5 +1,7 @@
 import { useState } from "react";
 import * as player from "../player";
+import loadingImage from "../images/loading.gif";
+import musicNoteImage from "../images/music-note.png";
 
 export default function SelectPage({ toggleShowPlayer }) {
     const [loading, setLoading] = useState(false);
@@ -31,6 +33,9 @@ export default function SelectPage({ toggleShowPlayer }) {
                         <label
                             htmlFor="file-upload"
                             className="open-button-holder"
+                            style={{
+                                backgroundImage: `url(${musicNoteImage})`,
+                            }}
                         >
                             Select songs...
                         </label>
@@ -40,7 +45,7 @@ export default function SelectPage({ toggleShowPlayer }) {
                     <>
                         <div className="loading-continer">
                             <div className="loading">Loading</div>
-                            <img src="images/loading.gif"></img>
+                            <img src={loadingImage}></img>
                         </div>
                     </>
                 )}

@@ -1,7 +1,7 @@
 import MusicEntery from "./MusicEntery";
 import * as player from "../player";
 import { useEffect, useState } from "react";
-
+import playlistImage from "../images/playlist.png";
 export default function Playlist({ togglePlaylistShow }) {
     const [songList, setSongList] = useState(player.getPlaylist());
     useEffect(() => {
@@ -38,7 +38,7 @@ export default function Playlist({ togglePlaylistShow }) {
 
     return (
         <>
-            <div className="playlist" id="playlist">
+            <div className="playlist">
                 <div className="playlist-start">
                     <input
                         id="addSong"
@@ -53,7 +53,7 @@ export default function Playlist({ togglePlaylistShow }) {
                         onClick={togglePlaylistShow}
                         className="list-exit button"
                         alt="List Exit"
-                        src="./images/playlist.png"
+                        src={playlistImage}
                     />
                     <label htmlFor="addSong" className="button">
                         Add Song

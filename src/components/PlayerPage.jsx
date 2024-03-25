@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import * as player from "../player";
 import Lyrics from "./Lyrics";
 import Progressbar from "./Progressbar";
+import MusicControls from "./MusicControls";
+import { SlPlaylist } from "react-icons/sl";
+import { RiPlayListAddFill } from "react-icons/ri";
+import noCoverImage from "../images/nocover.jpg";
 
 export default function PlayerPage({ togglePlaylistShow }) {
-    const [isPlaying, setIsPlaying] = useState(true);
     const [lyricsShow, setLyricsShow] = useState(false);
-    const [shuffle, setShuffle] = useState(player.getShuffle());
-    const [repeat, setRepeat] = useState(player.getRepeat());
     const [cover, setCover] = useState(player.getCover());
     const [showSongDetail, setShowSongDetail] = useState(true);
     const [songName, setSongName] = useState(player.getSongName());
     const [artistName, setArtistName] = useState(player.getArtistName());
+    const [isPlaying, setIsPlaying] = useState(true);
 
     const toggleLyric = () => {
         setLyricsShow((prevShow) => !prevShow);
@@ -22,69 +24,62 @@ export default function PlayerPage({ togglePlaylistShow }) {
     };
 
     useEffect(() => {
+        player.audio.addEventListener("loadedmetadata", () => {
+            setCover(player.getCover());
+            setSongName(player.getSongName());
+            setArtistName(player.getArtistName());
+            document.title = `MP!Tree - ${artistName} ${songName}`;
+        });
+        player.audio.addEventListener("srccleared", () => {
+            setCover(noCoverImage);
+            setSongName(player.getSongName());
+            setArtistName(player.getArtistName());
+        });
         player.audio.addEventListener("play", () => {
             setIsPlaying(true);
         });
         player.audio.addEventListener("pause", () => {
             setIsPlaying(false);
         });
-        player.audio.addEventListener("loadedmetadata", () => {
-            setCover(player.getCover());
-            setSongName(player.getSongName());
-            setArtistName(player.getArtistName());
-            setRepeat(player.getRepeat());
-            document.title = `MP!Tree - ${artistName} ${songName}`;
-        });
-        player.audio.addEventListener("srccleared", () => {
-            setCover("images/coversample.jpg");
-            setIsPlaying(false);
-            setSongName(player.getSongName());
-            setArtistName(player.getArtistName());
-        });
     }, []);
-
-    const togglePlayPause = () => {
-        if (isPlaying) {
-            player.pause();
-        } else {
-            player.play();
-        }
-    };
 
     return (
         <>
             <div className="playerContainer">
                 <div className="cover-plus">
                     <div className="other-controls">
-                        <img
-                            src="./images/playlist.png"
-                            alt="Playlist"
+                        <span
                             className="other-button button"
                             onClick={togglePlaylistShow}
-                        />
+                        >
+                            <RiPlayListAddFill
+                                size={20}
+                                className="button white react-icon"
+                            />
+                        </span>
 
                         <div
                             className="playerpage-songdetail button"
                             onClick={toggleShowSongDetail}
+                            style={
+                                showSongDetail ? { opacity: 1 } : { opacity: 0 }
+                            }
                         >
-                            {showSongDetail && (
-                                <>
-                                    <p className="playerpage-songname">
-                                        {songName}
-                                    </p>
-                                    <p className="playerpage-artistname">
-                                        {artistName}
-                                    </p>
-                                </>
-                            )}
+                            <p className="playerpage-songname">{songName}</p>
+                            <p className="playerpage-artistname">
+                                {artistName}
+                            </p>
                         </div>
 
-                        <img
+                        <span
                             onClick={toggleLyric}
-                            src="./images/lyrics.png"
-                            alt="Lyrics"
                             className="other-button button"
-                        />
+                        >
+                            <SlPlaylist
+                                size={20}
+                                className="button white react-icon"
+                            />
+                        </span>
                     </div>
                     <div className="cover-continer">
                         <img
@@ -92,69 +87,19 @@ export default function PlayerPage({ togglePlaylistShow }) {
                             alt="Cover"
                             className="cover-image"
                             id="cover-image"
+                            style={
+                                isPlaying
+                                    ? { width: "300px", height: "300px" }
+                                    : { width: "270px", height: "270px" }
+                            }
                         />
                     </div>
-                    {lyricsShow && <Lyrics />}
+                    <Lyrics
+                        style={lyricsShow ? { opacity: 0.9 } : { opacity: 0 }}
+                    />
                 </div>
                 <Progressbar />
-                <div className="music-controls">
-                    <img
-                        src={
-                            shuffle == "off"
-                                ? "images/shuffleDisable.png"
-                                : shuffle == "normal"
-                                ? "/images/shuffle.png"
-                                : shuffle == "smart"
-                                ? "/images/shuffleSmart.png"
-                                : ""
-                        }
-                        alt="Shuffle"
-                        className="control-button button"
-                        onClick={() => {
-                            player.toggleShuffle();
-                            setShuffle(player.getShuffle());
-                        }}
-                    />
-                    <img
-                        src="./images/prev.png"
-                        alt="Previus"
-                        className="control-button button"
-                        onClick={player.prev}
-                    />
-                    <img
-                        src={
-                            isPlaying
-                                ? "./images/pause.png"
-                                : "./images/play.png"
-                        }
-                        alt="Play"
-                        className="control-button button"
-                        onClick={togglePlayPause}
-                    />
-                    <img
-                        src="./images/next.png"
-                        alt="Next"
-                        className="control-button button"
-                        onClick={player.next}
-                    />
-                    <img
-                        src={
-                            repeat == "off"
-                                ? "images/repeatDisable.png"
-                                : repeat == "all"
-                                ? "images/repeat.png"
-                                : repeat == "single"
-                                ? "images/repeatSingle.png"
-                                : ""
-                        }
-                        alt="Repeat"
-                        className="control-button button"
-                        onClick={() => {
-                            player.toggleRepeat();
-                            setRepeat(player.getRepeat());
-                        }}
-                    />
-                </div>
+                <MusicControls />
             </div>
         </>
     );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as player from "../player";
 
-export default function Lyrics() {
+export default function Lyrics({ style }) {
     const [lyrics, setLyrics] = useState(player.getLyrics());
     const [activeIndex, setActiveIndex] = useState(-1);
     const lyricsRef = useRef(null);
@@ -74,7 +74,7 @@ export default function Lyrics() {
     };
     return (
         <>
-            <div className="lyrics-page" ref={lyricsRef}>
+            <div className="lyrics-page" ref={lyricsRef} style={style}>
                 {lyricsElement()}
             </div>
         </>
