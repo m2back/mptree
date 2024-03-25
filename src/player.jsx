@@ -1,6 +1,6 @@
 import * as mm from "music-metadata-browser";
 import { md5 } from "js-md5";
-import noCoverImage from "./images/nocover.jpg";
+import noCoverImage from "./images/nocover.png";
 
 /* ---------------Initializing Default Values----------------- */
 let originalPlaylist = [];

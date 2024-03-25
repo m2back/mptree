@@ -21,13 +21,29 @@
 }
 
 .main-window {
-    background-color: #151515;
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 50px;
+    filter: none;
+}
+
+.background-image {
+    background-size: cover;
+    height: 120%;
+    width: 110%;
+    position: fixed;
+    filter: blur(30px);
+    margin: -50px;
+    z-index: -1;
+}
+.background-top-color {
+    background: #151515;
+    width: 100%;
+    height: 100%;
+    opacity: 0.94;
 }
 
 .playerContainer {
@@ -188,7 +204,7 @@
     background-color: #090808;
     width: 100%;
     height: 50px;
-    z-index: 1;
+    z-index: 2;
 }
 .playlist-start span {
     margin-left: 25px;
@@ -276,7 +292,7 @@
     }
     .playlist {
         /* display: none; */
-        z-index: 1;
+        z-index: 2;
         margin: 30px;
     }
     .main-center-container {
@@ -355,7 +371,8 @@
     font-size: 2.5rem;
     font-family: "Madimi One";
     color: #29baa6;
-    padding-right: 7px;
+    position: fixed;
+    margin-bottom: 91px;
 }
 
 .loading-continer {

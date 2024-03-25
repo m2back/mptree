@@ -9,6 +9,14 @@ export default function Lyrics({ style }) {
     useEffect(() => {
         player.audio.addEventListener("loadedmetadata", () => {
             setLyrics(player.getLyrics());
+            const fiestLyricElement = lyricsRef.current.children[0];
+            if (fiestLyricElement) {
+                fiestLyricElement.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "nearest",
+                });
+            }
         });
 
         player.audio.addEventListener("srccleared", () => {
@@ -58,10 +66,13 @@ export default function Lyrics({ style }) {
                         key={index}
                         className="lyric-p button"
                         style={{
-                            color: active ? "#5cceae" : "wheat",
-                            fontSize: active && "1.2em",
+                            color: active ? "white" : "#fffd",
+                            fontSize: active && "1.1em",
+                            fontWeight: active && 800,
                             paddingTop: active && "7px",
                             paddingBottom: active && "7px",
+                            marginLeft: active && "-0.1em",
+                            marginRight: active && "-0.1em",
                         }}
                     >
                         {lyric.text}

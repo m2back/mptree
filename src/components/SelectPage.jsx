@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as player from "../player";
-import loadingImage from "../images/loading.gif";
+import loadingImage from "../images/loading.svg";
 import musicNoteImage from "../images/music-note.png";
 
 export default function SelectPage({ toggleShowPlayer }) {
