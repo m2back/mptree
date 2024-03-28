@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import MainPage from "./components/MainPage.jsx";
+import MainPage from "./components/MainPage";
+import PlayerContext from "./components/PlayerContext";
 import { Buffer } from "buffer";
 globalThis.Buffer = Buffer;
 import * as process from "process";
@@ -8,6 +9,8 @@ globalThis.process = process;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <MainPage />
+        <PlayerContext>
+            <MainPage />
+        </PlayerContext>
     </React.StrictMode>
 );

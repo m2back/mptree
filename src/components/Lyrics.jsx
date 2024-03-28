@@ -1,49 +1,24 @@
-import { useEffect, useRef, useState } from "react";
-import * as player from "../player";
+import { useContext, useEffect, useRef } from "react";
+import { PlayerContext } from "./PlayerContext";
 
 export default function Lyrics({ style }) {
-    const [lyrics, setLyrics] = useState(player.getLyrics());
-    const [activeIndex, setActiveIndex] = useState(-1);
+    const { currentSong, setTime, play, activeLyricIndex } =
+        useContext(PlayerContext);
     const lyricsRef = useRef(null);
 
     useEffect(() => {
-        player.audio.addEventListener("loadedmetadata", () => {
-            setLyrics(player.getLyrics());
-            const fiestLyricElement = lyricsRef.current.children[0];
-            if (fiestLyricElement) {
-                fiestLyricElement.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                    inline: "nearest",
-                });
-            }
-        });
-
-        player.audio.addEventListener("srccleared", () => {
-            setLyrics(null);
-        });
-    }, []);
+        const firstLyricElement = lyricsRef.current.children[0];
+        if (firstLyricElement) {
+            firstLyricElement.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "nearest",
+            });
+        }
+    }, [currentSong?.lyric]);
 
     useEffect(() => {
-        player.audio.addEventListener("timeupdate", () => {
-            const currentTime = player.audio.currentTime;
-            if (lyrics) {
-                const foundIndex = lyrics.findIndex((lyric) => {
-                    if (
-                        lyric.start <= currentTime &&
-                        lyric.end >= currentTime
-                    ) {
-                        return true;
-                    }
-                });
-                setActiveIndex(foundIndex);
-            }
-        });
-        console.log("UseEffect is running");
-    }, [lyrics]);
-
-    useEffect(() => {
-        const activeLyricElement = lyricsRef.current.children[activeIndex];
+        const activeLyricElement = lyricsRef.current.children[activeLyricIndex];
         if (activeLyricElement) {
             activeLyricElement.scrollIntoView({
                 behavior: "smooth",
@@ -51,17 +26,17 @@ export default function Lyrics({ style }) {
                 inline: "nearest",
             });
         }
-    }, [activeIndex]);
+    }, [activeLyricIndex]);
 
     const lyricsElement = () => {
-        if (lyrics) {
-            return lyrics.map((lyric, index) => {
-                const active = index === activeIndex;
+        if (currentSong?.lyric) {
+            return currentSong.lyric.map((lyric, index) => {
+                const active = index === activeLyricIndex;
                 return (
                     <p
                         onClick={() => {
-                            player.audio.currentTime = lyric.start;
-                            player.play();
+                            setTime(lyric.start);
+                            play();
                         }}
                         key={index}
                         className="lyric-p button"

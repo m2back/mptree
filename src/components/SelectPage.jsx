@@ -1,17 +1,18 @@
-import { useState } from "react";
-import * as player from "../player";
+import { useContext, useState } from "react";
+import * as playerOptions from "../playerOptions";
+import { PlayerContext } from "./PlayerContext";
 import loadingImage from "../images/loading.svg";
 import musicNoteImage from "../images/music-note.png";
 
 export default function SelectPage({ toggleShowPlayer }) {
+    const { setList } = useContext(PlayerContext);
     const [loading, setLoading] = useState(false);
     const setSong = async (e) => {
         setLoading(true);
-        const songs = await player.getSongListFromFiles(e.target.files);
-        if (songs?.length > 0) {
+        const list = await playerOptions.getSongListFromFiles(e.target.files);
+        if (list?.length > 0) {
             toggleShowPlayer();
-            player.setList(songs);
-            player.initialPlayer();
+            setList(list);
         } else {
             setLoading(false);
         }

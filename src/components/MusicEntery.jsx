@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import * as player from "../player";
+import { useContext } from "react";
 import { RiPlayListFill } from "react-icons/ri";
+import { PlayerContext } from "./PlayerContext";
 export default function MusicEntery({
     cover,
     id,
@@ -9,21 +9,8 @@ export default function MusicEntery({
     album,
     lyric,
 }) {
-    const CurrentSongId = player.getCurrentSongId();
-    const [active, setActive] = useState(CurrentSongId === id);
-
-    useEffect(() => {
-        const handleLoadedmetadata = () => {
-            setActive(player.getCurrentSongId() === id);
-        };
-        player.audio.addEventListener("loadedmetadata", handleLoadedmetadata);
-        return () => {
-            player.audio.removeEventListener(
-                "loadedmetadata",
-                handleLoadedmetadata
-            );
-        };
-    }, []);
+    const { currentSong, playSongById } = useContext(PlayerContext);
+    const active = currentSong.id === id;
 
     return (
         <>
@@ -37,7 +24,7 @@ export default function MusicEntery({
                     transition: active && "all 0.2s ease-in-out 0s",
                 }}
                 onClick={() => {
-                    player.playSongById(id);
+                    playSongById(id);
                 }}
             >
                 <div className="entry-cover">

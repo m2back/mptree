@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import * as player from "../player";
+import { useContext, useEffect, useState } from "react";
+import { PlayerContext } from "./PlayerContext";
 import Lyrics from "./Lyrics";
 import Progressbar from "./Progressbar";
 import MusicControls from "./MusicControls";
@@ -8,12 +8,9 @@ import { RiPlayListAddFill } from "react-icons/ri";
 import noCoverImage from "../images/nocover.png";
 
 export default function PlayerPage({ togglePlaylistShow }) {
+    const { currentSong, isPlaying } = useContext(PlayerContext);
     const [lyricsShow, setLyricsShow] = useState(false);
-    const [cover, setCover] = useState(player.getCover());
     const [showSongDetail, setShowSongDetail] = useState(true);
-    const [songName, setSongName] = useState(player.getSongName());
-    const [artistName, setArtistName] = useState(player.getArtistName());
-    const [isPlaying, setIsPlaying] = useState(true);
 
     const toggleLyric = () => {
         setLyricsShow((prevShow) => !prevShow);
@@ -24,37 +21,8 @@ export default function PlayerPage({ togglePlaylistShow }) {
     };
 
     useEffect(() => {
-        const handleMetadata = () => {
-            setCover(player.getCover());
-            setSongName(player.getSongName());
-            setArtistName(player.getArtistName());
-            document.title = `MP!Tree - ${artistName} ${songName}`;
-        };
-        const handleSrccleared = () => {
-            setCover(noCoverImage);
-            setSongName("");
-            setArtistName("");
-        };
-
-        const handlePlay = () => {
-            setIsPlaying(true);
-        };
-        const handlePause = () => {
-            setIsPlaying(false);
-        };
-
-        player.audio.addEventListener("loadedmetadata", handleMetadata);
-        player.audio.addEventListener("srccleared", handleSrccleared);
-        player.audio.addEventListener("play", handlePlay);
-        player.audio.addEventListener("pause", handlePause);
-
-        return () => {
-            player.audio.removeEventListener("loadedmetadata", handleMetadata);
-            player.audio.removeEventListener("srccleared", handleSrccleared);
-            player.audio.removeEventListener("play", handlePlay);
-            player.audio.removeEventListener("pause", handlePause);
-        };
-    }, []);
+        document.title = `MP!Tree - ${currentSong?.artist} ${currentSong?.title}`;
+    }, [currentSong]);
 
     return (
         <>
@@ -78,9 +46,11 @@ export default function PlayerPage({ togglePlaylistShow }) {
                                 showSongDetail ? { opacity: 1 } : { opacity: 0 }
                             }
                         >
-                            <p className="playerpage-songname">{songName}</p>
+                            <p className="playerpage-songname">
+                                {currentSong?.title}
+                            </p>
                             <p className="playerpage-artistname">
-                                {artistName}
+                                {currentSong?.artist}
                             </p>
                         </div>
 
@@ -96,7 +66,7 @@ export default function PlayerPage({ togglePlaylistShow }) {
                     </div>
                     <div className="cover-continer">
                         <img
-                            src={cover}
+                            src={currentSong?.cover || noCoverImage}
                             alt="Cover"
                             className="cover-image"
                             id="cover-image"

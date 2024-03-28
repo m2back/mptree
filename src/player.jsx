@@ -6,8 +6,8 @@ import noCoverImage from "./images/nocover.png";
 let originalPlaylist = [];
 let playlist = [];
 let currentSongId = null;
-let shuffleMode = "off";
-let repeatMode = "off";
+let shuffle = "off";
+let repeat = "off";
 let playTimes;
 const playTimesLS = localStorage.getItem("playTimes");
 if (playTimesLS) {
@@ -38,7 +38,7 @@ const shuffleArray = (array) => {
     return array;
 };
 
-function splitArrayToChunks(arr, chunk) {
+const splitArrayToChunks = (arr, chunk) => {
     let chunkSize;
 
     if (arr.length < chunk) {
@@ -54,7 +54,7 @@ function splitArrayToChunks(arr, chunk) {
     }
 
     return result;
-}
+};
 
 const smartShuffle = (playlist, playTimes) => {
     // Adding Playtime to playlist
@@ -174,11 +174,11 @@ audio.addEventListener("ended", () => {
     const currentSongIndex = playlist.findIndex(
         (song) => song.id === currentSongId
     );
-    if (repeatMode === "single") {
+    if (repeat === "single") {
         setAudio(currentSongIndex);
     } else if (
         currentSongIndex === playlist.length - 1 &&
-        repeatMode === "all"
+        repeat === "all"
     ) {
         setAudio(0);
     } else if (currentSongIndex < playlist.length - 1) {
@@ -216,11 +216,11 @@ export const initialPlayer = () => {
 
 const playlistChange = () => {
     if (originalPlaylist && originalPlaylist.length > 0) {
-        if (shuffleMode === "normal") {
+        if (shuffle === "normal") {
             playlist = shuffleArray([...originalPlaylist]);
-        } else if (shuffleMode === "smart") {
+        } else if (shuffle === "smart") {
             playlist = smartShuffle([...originalPlaylist], playTimes);
-        } else if (shuffleMode === "off") {
+        } else if (shuffle === "off") {
             playlist = [...originalPlaylist];
         }
     }
@@ -344,7 +344,7 @@ export const next = () => {
     } else {
         setAudio(0);
     }
-    repeatMode === "single" ? (repeatMode = "all") : null;
+    repeat === "single" ? (repeat = "all") : null;
 };
 
 export const prev = () => {
@@ -359,27 +359,27 @@ export const prev = () => {
 };
 
 export const toggleShuffle = () => {
-    if (shuffleMode === "off") {
-        shuffleMode = "normal";
+    if (shuffle === "off") {
+        shuffle = "normal";
         playlist = shuffleArray([...originalPlaylist]);
-    } else if (shuffleMode === "normal") {
-        shuffleMode = "smart";
+    } else if (shuffle === "normal") {
+        shuffle = "smart";
         playlist = smartShuffle([...originalPlaylist], playTimes);
-    } else if (shuffleMode === "smart") {
-        shuffleMode = "off";
+    } else if (shuffle === "smart") {
+        shuffle = "off";
         playlist = [...originalPlaylist];
     }
 };
 
 export const toggleRepeat = () => {
-    if (repeatMode == "off") {
-        repeatMode = "all";
-    } else if (repeatMode == "all") {
-        repeatMode = "single";
-    } else if (repeatMode == "single") {
-        repeatMode = "off";
+    if (repeat == "off") {
+        repeat = "all";
+    } else if (repeat == "all") {
+        repeat = "single";
+    } else if (repeat == "single") {
+        repeat = "off";
     } else {
-        repeatMode = "off";
+        repeat = "off";
     }
 };
 
@@ -405,11 +405,11 @@ export const getCurrentSongId = () => {
 };
 
 export const getRepeat = () => {
-    return repeatMode;
+    return repeat;
 };
 
 export const getShuffle = () => {
-    return shuffleMode;
+    return shuffle;
 };
 
 export const getCover = () => {

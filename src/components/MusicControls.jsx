@@ -1,21 +1,27 @@
-import { useEffect, useState } from "react";
-import * as player from "../player";
-
+import { PlayerContext } from "./PlayerContext";
 import { PiShuffleBold, PiShuffleDuotone } from "react-icons/pi";
 import { TbRepeatOnce, TbRepeat } from "react-icons/tb";
 import { GrPrevious, GrNext } from "react-icons/gr";
 import { FaPlay, FaPause } from "react-icons/fa";
+import { useContext } from "react";
 
 export default function MusicControls() {
-    const [shuffle, setShuffle] = useState(player.getShuffle());
-    const [repeat, setRepeat] = useState(player.getRepeat());
-    const [isPlaying, setIsPlaying] = useState(true);
-    const size = 20;
+    const {
+        repeatMode,
+        toggleRepeat,
+        shuffleMode,
+        toggleShuffle,
+        togglePlayPause,
+        isPlaying,
+        prev,
+        next,
+    } = useContext(PlayerContext);
 
+    const size = 20;
     const shuffleIcons = {
         off: (
             <PiShuffleBold
-                size={size}
+                size={size * 0.9}
                 className="white react-icon icon-disable"
             />
         ),
@@ -38,69 +44,18 @@ export default function MusicControls() {
         single: <TbRepeatOnce size={size * 0.9} className="white react-icon" />,
     };
 
-    const handleShuffle = () => {
-        player.toggleShuffle();
-        setShuffle(player.getShuffle());
-    };
-
-    const handleRepeat = () => {
-        player.toggleRepeat();
-        setRepeat(player.getRepeat());
-    };
-
-    const handlePlayPause = () => {
-        if (isPlaying) {
-            player.pause();
-        } else {
-            player.play();
-        }
-    };
-
-    useEffect(() => {
-        const handlePlay = () => {
-            setIsPlaying(true);
-        };
-
-        const handlePause = () => {
-            setIsPlaying(false);
-        };
-
-        const handleLoadedMetadata = () => {
-            setRepeat(player.getRepeat());
-        };
-
-        const handleSrcCleared = () => {
-            setIsPlaying(false);
-        };
-
-        player.audio.addEventListener("play", handlePlay);
-        player.audio.addEventListener("pause", handlePause);
-        player.audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-        player.audio.addEventListener("srccleared", handleSrcCleared);
-        
-        return () => {
-            player.audio.removeEventListener("play", handlePlay);
-            player.audio.removeEventListener("pause", handlePause);
-            player.audio.removeEventListener(
-                "loadedmetadata",
-                handleLoadedMetadata
-            );
-            player.audio.removeEventListener("srccleared", handleSrcCleared);
-        };
-    }, []);
-
     return (
         <>
             <div className="music-controls">
-                <span className="button" onClick={handleShuffle}>
-                    {shuffleIcons[shuffle]}
+                <span className="button" onClick={toggleShuffle}>
+                    {shuffleIcons[shuffleMode]}
                 </span>
                 <GrPrevious
                     size={size * 1.3}
                     className="button white react-icon"
-                    onClick={player.prev}
+                    onClick={prev}
                 />
-                <span className="button" onClick={handlePlayPause}>
+                <span className="button" onClick={togglePlayPause}>
                     {isPlaying ? (
                         <FaPause
                             size={size * 1.4}
@@ -116,10 +71,10 @@ export default function MusicControls() {
                 <GrNext
                     size={size * 1.2}
                     className="button white react-icon"
-                    onClick={player.next}
+                    onClick={next}
                 />
-                <span className="button" onClick={handleRepeat}>
-                    {repeatIcons[repeat]}
+                <span className="button" onClick={toggleRepeat}>
+                    {repeatIcons[repeatMode]}
                 </span>
             </div>
         </>

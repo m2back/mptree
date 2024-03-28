@@ -1,22 +1,11 @@
 import MusicEntery from "./MusicEntery";
-import * as player from "../player";
-import { useEffect, useState } from "react";
 import playlistImage from "../images/playlist.png";
-export default function Playlist({ togglePlaylistShow }) {
-    const [songList, setSongList] = useState(player.getPlaylist());
-    useEffect(() => {
-        const handlePlaylistchange = () => {
-            setSongList(player.getPlaylist());
-        };
-        player.audio.addEventListener("playlistchange", handlePlaylistchange);
-        return () => {
-            player.audio.removeEventListener(
-                "playlistchange",
-                handlePlaylistchange
-            );
-        };
-    }, []);
+import { PlayerContext } from "./PlayerContext";
+import { useContext } from "react";
+import * as playerOptions from "../playerOptions";
 
+export default function Playlist({ togglePlaylistShow }) {
+    const { clearList, appendList, playlist } = useContext(PlayerContext);
     const musicList = (list) => {
         return list.map((song) => {
             return (
@@ -35,12 +24,12 @@ export default function Playlist({ togglePlaylistShow }) {
     };
 
     const Clear = () => {
-        player.clearList();
+        clearList();
     };
 
     const addSong = async (e) => {
-        const songs = await player.getSongListFromFiles(e.target.files);
-        player.appendList(songs);
+        const songs = await playerOptions.getSongListFromFiles(e.target.files);
+        appendList(songs);
     };
 
     return (
@@ -69,7 +58,7 @@ export default function Playlist({ togglePlaylistShow }) {
                         Clear
                     </span>
                 </div>
-                {musicList(songList)}
+                {musicList(playlist)}
                 <div className="playlist-end">
                     The <span>♥</span> End
                 </div>
