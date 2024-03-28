@@ -229,7 +229,6 @@ export default function App({ children }) {
 
     useEffect(() => {
         const handleEnd = () => {
-            console.log(playlistRef.current);
             const currentSongIndex = playlistRef.current.findIndex(
                 (song) => song.id === currentSongRef.current.id
             );
