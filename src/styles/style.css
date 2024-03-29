@@ -148,6 +148,7 @@
     justify-content: center;
     margin-bottom: 10px;
     border-radius: 5px;
+    position: relative;
 }
 .entry-cover {
     flex: 2;
@@ -418,4 +419,102 @@
 }
 .icon-disable {
     opacity: 50%;
+}
+
+.menu-menu {
+    position: absolute;
+}
+
+.menu-blur {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    transition: all 0.25s ease-in-out;
+    opacity: 0;
+}
+.menu-dropdown {
+    width: fit-content;
+    min-width: 150px;
+    padding: 10px 8px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    border: #090808 solid 2px;
+    background-color: #eaf0d7;
+    position: fixed;
+    z-index: 1001;
+    transition: all 0.1s ease-in-out;
+    opacity: 0;
+}
+
+.menu-sub-title {
+    color: #29baa6;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 1.2em;
+    text-align: center;
+    min-width: 200px;
+}
+
+.entry-menu {
+    position: absolute;
+    top: 22px;
+    right: 5px;
+    width: auto;
+    transition: all 0.3s;
+}
+.entry-menu-button {
+    background-color: #242121eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 3px;
+    border: solid 2px #4d4d4d;
+    transition: all 0.3s;
+}
+.entry-menu-dropdown {
+    color: white;
+    width: auto;
+    background-color: #111010;
+    border: solid black 1px;
+    padding: 10px 8px;
+    border-radius: 8px;
+}
+
+.entry-menu-item {
+    margin: 2px 0;
+    padding: 9px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    transition: all 0.15s ease-in-out;
+    min-width: 80%;
+}
+.entry-menu-item:hover {
+    background-color: #312e2e63;
+}
+
+.entry-playpauseicon {
+    position: absolute;
+    color: white;
+    opacity: 0.8;
+    background-color: #000000be;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 93%;
+    height: 100%;
+    border-radius: 9px;
+    transition: 0.3s all;
 }

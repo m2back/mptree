@@ -33,7 +33,6 @@ export default function App({ children }) {
     }, [repeatMode]);
 
     const setAudio = (index) => {
-        console.log(playlistRef.current);
         if (playlistRef.current.length > 0) {
             audio.src = playlistRef.current[index].address;
             setCurrentSong(playlistRef.current[index]);
@@ -219,6 +218,22 @@ export default function App({ children }) {
         }
     };
 
+    const removeSongById = (id) => {
+        const foundSongIndex = playlist.findIndex((song) => {
+            return song.id == id;
+        });
+
+        if (foundSongIndex >= 0) {
+            setOriginalPlaylist((prevPlaylist) => {
+                return prevPlaylist.filter((song) => {
+                    return song.id !== id;
+                });
+            });
+        } else {
+            console.log(`Song  with ID: ${id} Not Found`);
+        }
+    };
+
     const seek = (time) => {
         audio.currentTime = time;
     };
@@ -305,6 +320,7 @@ export default function App({ children }) {
         setTime,
         play,
         activeLyricIndex,
+        removeSongById,
     };
     return (
         <PlayerContext.Provider value={playlistContent}>
