@@ -1,6 +1,11 @@
+import noCoverImage from "./images/nocover.png";
+import axios from "axios";
 import * as mm from "music-metadata-browser";
 import { md5 } from "js-md5";
-import noCoverImage from "./images/nocover.png";
+import { toast } from "react-hot-toast";
+import { IoCloudDownload } from "react-icons/io5";
+import { MdCancel } from "react-icons/md";
+import { RxCross1 } from "react-icons/rx";
 
 export const shuffleArray = (array) => {
     let currentIndex = array.length,
@@ -68,6 +73,7 @@ const getSongDetail = async (file) => {
     try {
         const fileURL = URL.createObjectURL(file);
         const metadata = await mm.parseBlob(file);
+        const format = file.name.split(".").pop();
         let imageURL;
         if (metadata.common.picture) {
             const pictureData = metadata.common.picture[0];
@@ -78,10 +84,10 @@ const getSongDetail = async (file) => {
         } else {
             imageURL = noCoverImage;
         }
-
-        return {
+        const list = {
             id: md5(file.name),
             name: file.name.split(".").slice(0, -1).join("."),
+            format: format,
             address: fileURL,
             title:
                 metadata.common.title ||
@@ -90,6 +96,7 @@ const getSongDetail = async (file) => {
             album: metadata.common.album || "Unknown Album",
             cover: imageURL,
         };
+        return list;
     } catch (e) {
         if (
             e.name === "SecurityError" &&
@@ -195,5 +202,190 @@ export const getSongListFromFiles = async (files) => {
         console.log("Failed to get Files from list");
         console.log(e.message);
         throw e;
+    }
+};
+
+const toastElement = (name, text, action, onClick = () => {}) => {
+    return (
+        <div className="toast-container">
+            <div>
+                <div>{name}</div>
+                <div>{text}</div>
+            </div>
+
+            {action && (
+                <div onClick={onClick} className="toast-sub-action">
+                    {action}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const downloadFile = async (downloadLink, notifId, notifTitle) => {
+    const source = axios.CancelToken.source();
+    try {
+        const response = await axios({
+            method: "get",
+            url: downloadLink,
+            responseType: "blob",
+            cancelToken: source.token,
+            onDownloadProgress: (progressEvent) => {
+                const total = progressEvent.total;
+                const loaded = progressEvent.loaded;
+                const percent = Math.round((loaded / total) * 100);
+                toast.loading(
+                    toastElement(
+                        notifTitle,
+                        `${percent}% Downloaded`,
+                        <MdCancel size={20} />,
+                        () => {
+                            console.log("canceled");
+                            source.cancel("Download canceled by user");
+                        }
+                    ),
+                    {
+                        id: notifId,
+                    }
+                );
+            },
+        });
+
+        const blob = response.data;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = notifTitle;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        toast.success(
+            toastElement(
+                notifTitle,
+                `Download Completed`,
+                <RxCross1 size={15} />,
+                () => {
+                    toast.dismiss(notifId);
+                }
+            ),
+            {
+                id: notifId,
+            }
+        );
+    } catch (error) {
+        console.error("Error downloading file:", error);
+        toast.error(toastElement(notifTitle, "Canceled"), {
+            id: notifId,
+            duration: 2000,
+        });
+    }
+};
+
+export const convertTo = async (sourceFile, name, targetFormat, host) => {
+    const iconSize = 20;
+    const toastId = toast.loading("Uploading...");
+
+    try {
+        const response = await fetch(sourceFile);
+        const blob = await response.blob();
+
+        const form = new FormData();
+        form.append("file", blob, name);
+        form.append("format", targetFormat);
+        form.append("name", name);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `${host}/convert`);
+
+        const cancelXhr = () => {
+            xhr.abort();
+            toast.error(toastElement(name, "Canceled"), {
+                id: toastId,
+                duration: 2000,
+            });
+        };
+
+        xhr.upload.onprogress = (e) => {
+            console.log(`${e.type}: ${e.loaded} bytes transferred\n`);
+            const progressPercent = Math.round((e.loaded / e.total) * 100);
+            toast.loading(
+                toastElement(
+                    name,
+                    progressPercent + "% Uploaded",
+                    <MdCancel size={iconSize} />,
+                    cancelXhr
+                ),
+                {
+                    id: toastId,
+                }
+            );
+            if (e.loaded == e.total) {
+                console.log("upload Finished");
+                toast.loading(
+                    toastElement(
+                        name,
+                        `Coverting`,
+                        <MdCancel size={iconSize} />,
+                        cancelXhr
+                    ),
+                    {
+                        id: toastId,
+                    }
+                );
+            }
+        };
+
+        xhr.onloadend = () => {
+            const response = JSON.parse(xhr.response);
+            const downloadLink = host + response.downloadUrl;
+            console.log(downloadLink);
+            toast.success(
+                toastElement(
+                    name,
+                    "Completed",
+                    <IoCloudDownload size={iconSize} />,
+                    () => {
+                        downloadFile(downloadLink, toastId, name);
+                    }
+                ),
+                {
+                    id: toastId,
+                    duration: 20000,
+                }
+            );
+        };
+
+        xhr.onerror = () => {
+            toast.error(
+                toastElement(
+                    name,
+                    "Upload Failed",
+                    <RxCross1 size={iconSize * 0.75} />,
+                    () => {
+                        toast.dismiss(toastId);
+                    }
+                ),
+                {
+                    id: toastId,
+                }
+            );
+        };
+
+        xhr.send(form);
+    } catch (error) {
+        toast.error(
+            toastElement(
+                name,
+                "Upload Failed",
+                <RxCross1 size={iconSize} />,
+                () => {
+                    toast.dismiss(toastId);
+                }
+            ),
+            {
+                id: toastId,
+            }
+        );
+        console.error("Error uploading file:", error);
     }
 };

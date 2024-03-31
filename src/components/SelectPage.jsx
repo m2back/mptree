@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import * as playerOptions from "../playerOptions";
 import { PlayerContext } from "./PlayerContext";
-import loadingImage from "../images/loading.svg";
+import { BeatLoader } from "react-spinners";
 import musicNoteImage from "../images/music-note.png";
 
 export default function SelectPage({ toggleShowPlayer }) {
@@ -46,7 +46,7 @@ export default function SelectPage({ toggleShowPlayer }) {
                     <>
                         <div className="loading-continer">
                             <div className="loading">Loading</div>
-                            <img src={loadingImage}></img>
+                            <BeatLoader color="#36d7b7" />
                         </div>
                     </>
                 )}

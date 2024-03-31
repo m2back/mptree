@@ -1,11 +1,13 @@
 import MusicEntery from "./MusicEntery";
 import playlistImage from "../images/playlist.png";
 import { PlayerContext } from "./PlayerContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { BarLoader } from "react-spinners";
 import * as playerOptions from "../playerOptions";
 
 export default function Playlist({ togglePlaylistShow }) {
     const { clearList, appendList, playlist } = useContext(PlayerContext);
+    const [loadingList, setLoadingList] = useState(false);
     const musicList = (list) => {
         return list.map((song) => {
             return (
@@ -18,6 +20,9 @@ export default function Playlist({ togglePlaylistShow }) {
                     artist={song.artist}
                     title={song.title}
                     lyric={song.lyric ? true : false}
+                    format={song.format}
+                    address={song.address}
+                    name={song.name}
                 />
             );
         });
@@ -28,7 +33,9 @@ export default function Playlist({ togglePlaylistShow }) {
     };
 
     const addSong = async (e) => {
+        setLoadingList(true);
         const songs = await playerOptions.getSongListFromFiles(e.target.files);
+        setLoadingList(false);
         appendList(songs);
     };
 
@@ -59,6 +66,11 @@ export default function Playlist({ togglePlaylistShow }) {
                     </span>
                 </div>
                 {musicList(playlist)}
+                {loadingList && (
+                    <div className="playlist-loading">
+                        <BarLoader color="#36d7b7" />
+                    </div>
+                )}
                 <div className="playlist-end">
                     The <span>♥</span> End
                 </div>

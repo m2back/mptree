@@ -16,7 +16,6 @@ if (playTimesLS) {
     playTimes = {};
 }
 
-// console.log(playTimesLS);
 export const audio = new Audio();
 
 /* ---------------Internal Functions----------------- */

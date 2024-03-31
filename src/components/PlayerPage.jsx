@@ -5,6 +5,7 @@ import Progressbar from "./Progressbar";
 import MusicControls from "./MusicControls";
 import { SlPlaylist } from "react-icons/sl";
 import { RiPlayListAddFill } from "react-icons/ri";
+
 import noCoverImage from "../images/nocover.png";
 
 export default function PlayerPage({ togglePlaylistShow }) {

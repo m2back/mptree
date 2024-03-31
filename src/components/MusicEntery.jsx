@@ -4,6 +4,9 @@ import { RiPlayListFill } from "react-icons/ri";
 import { PlayerContext } from "./PlayerContext";
 import { TfiMoreAlt } from "react-icons/tfi";
 import { FaPlay, FaPause } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
+import * as playerOptions from "../playerOptions";
+
 export default function MusicEntery({
     cover,
     id,
@@ -11,8 +14,13 @@ export default function MusicEntery({
     artist,
     album,
     lyric,
+    format,
+    address,
+    name,
 }) {
     const [isMouseIn, setIsMouseIn] = useState(false);
+    const favlist = JSON.parse(localStorage.getItem("favoriteSongs")) || [];
+    const [isFave, setIsFave] = useState(favlist.includes(id));
     const {
         currentSong,
         playSongById,
@@ -20,13 +28,46 @@ export default function MusicEntery({
         isPlaying,
         removeSongById,
     } = useContext(PlayerContext);
+
     const active = currentSong.id === id;
+
     const handleMouseEnter = () => {
         setIsMouseIn(true);
     };
+
     const handleMouseLeave = () => {
         setIsMouseIn(false);
     };
+
+    const hostURL = "http://localhost:3000";
+
+    const addToFavHandler = () => {
+        const favlist = JSON.parse(localStorage.getItem("favoriteSongs")) || [];
+        const index = favlist.indexOf(id);
+        if (index > -1) {
+            favlist.splice(index, 1);
+        } else {
+            favlist.push(id);
+        }
+        setIsFave((prevFav) => !prevFav);
+        localStorage.setItem("favoriteSongs", JSON.stringify(favlist));
+    };
+
+    const formatElemets = ["mp3", "m4a", "flac", "ogg"].map((item) => {
+        if (item !== format) {
+            return (
+                <Menu.Item
+                    key={item}
+                    className="entry-menu-item"
+                    onClick={() => {
+                        playerOptions.convertTo(address, name, item, hostURL);
+                    }}
+                >
+                    {item.toUpperCase()}
+                </Menu.Item>
+            );
+        }
+    });
 
     return (
         <>
@@ -43,11 +84,17 @@ export default function MusicEntery({
                 }}
             >
                 <div className="entry-cover">
+                    {isFave && (
+                        <div className="entry-favbox">
+                            <FaStar className="entry-favbox-star" size={15} />
+                        </div>
+                    )}
                     {lyric && (
                         <span className="entry-lyric">
                             <RiPlayListFill className="white" />
                         </span>
                     )}
+
                     {!active && (
                         <div
                             onClick={() => {
@@ -83,8 +130,18 @@ export default function MusicEntery({
                         className="entry-cover-image"
                     />
                 </div>
-                <div className="entry-details">
-                    <span className="entry-title">{title}</span>
+                <div
+                    className="entry-details button"
+                    onClick={() => {
+                        playSongById(id);
+                    }}
+                >
+                    <span
+                        className="entry-title"
+                        style={{ color: isFave && "gold" }}
+                    >
+                        {title}
+                    </span>
                     <br />
                     <span className="entry-artist">{artist}</span>
                     <span> • </span>
@@ -98,8 +155,14 @@ export default function MusicEntery({
                         <TfiMoreAlt />
                     </Menu.Button>
                     <Menu.Dropdown className="entry-menu-dropdown">
-                        <Menu.Item className="entry-menu-item">
-                            Add to Favorites
+                        <Menu.Item
+                            className="entry-menu-item"
+                            onClick={addToFavHandler}
+                            style={{ color: "gold" }}
+                        >
+                            {isFave
+                                ? "Remove from Favorites"
+                                : "Add to Favorites"}
                         </Menu.Item>
                         <Menu.Item
                             className="entry-menu-item"
@@ -116,23 +179,7 @@ export default function MusicEntery({
                             value="Convert to ..."
                             prompt="Select Format"
                         >
-                            <Menu.Item
-                                className="entry-menu-item"
-                                onClick={() => {
-                                    console.log("MP3ed");
-                                }}
-                            >
-                                MP3
-                            </Menu.Item>
-                            <Menu.Item className="entry-menu-item">
-                                OGG
-                            </Menu.Item>
-                            <Menu.Item className="entry-menu-item">
-                                M4a
-                            </Menu.Item>
-                            <Menu.Item className="entry-menu-item">
-                                FLAC
-                            </Menu.Item>
+                            {formatElemets}
                         </Menu.Sub>
                     </Menu.Dropdown>
                 </Menu>

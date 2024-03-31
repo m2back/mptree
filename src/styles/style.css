@@ -153,18 +153,20 @@
 .entry-cover {
     flex: 2;
     position: relative;
+    max-width: 64px;
+    margin-right: 10px;
 }
 
 .entry-lyric {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.692);
     border-top-left-radius: 3px;
-    border-bottom-right-radius: 5px;
+    border-bottom-right-radius: 9px;
     padding-left: 3px;
     padding-right: 3px;
     padding-top: 5px;
     bottom: 0;
-    right: 5px;
+    right: 0;
 }
 
 .entry-details {
@@ -179,11 +181,32 @@
     max-height: 100%;
     border-radius: 10px;
 }
+.entry-favbox {
+    position: absolute;
+    width: 62px;
+    height: 62px;
+}
+.entry-favbox-star {
+    position: absolute;
+    color: rgb(234, 238, 20);
+    bottom: 0px;
+    left: 0px;
+    stroke: rgb(110, 15, 62);
+    stroke-width: 30;
+}
 .entry-artist {
     color: rgb(224, 18, 53);
 }
 .entry-album {
     color: #e69c70ed;
+}
+
+.playlist-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
 }
 
 .playlist-end {
@@ -513,8 +536,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 93%;
+    width: 100%;
     height: 100%;
     border-radius: 9px;
     transition: 0.3s all;
+}
+
+.toast-container {
+    width: 100%;
+    padding: 0 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.toast-sub-action {
+    color: white;
+    border-radius: 3px;
+    padding: 0px 10px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
