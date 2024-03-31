@@ -205,6 +205,16 @@ export const getSongListFromFiles = async (files) => {
     }
 };
 
+export const favToggle = (id) => {
+    const favlist = JSON.parse(localStorage.getItem("favoriteSongs")) || [];
+    const index = favlist.indexOf(id);
+    if (index > -1) {
+        favlist.splice(index, 1);
+    } else {
+        favlist.push(id);
+    }
+    localStorage.setItem("favoriteSongs", JSON.stringify(favlist));
+};
 const toastElement = (name, text, action, onClick = () => {}) => {
     return (
         <div className="toast-container">

@@ -14,7 +14,7 @@ export default function MenuButton({
             onClick={(e) => {
                 onClick();
                 toggle();
-                setLocation({ left: e.clientX, top: e.clientY });
+                setLocation({ left: e.clientX - 75, top: e.clientY + 5 });
             }}
             className={`menu-button button ${className}`}
         >

@@ -30,28 +30,7 @@ export default function MusicEntery({
     } = useContext(PlayerContext);
 
     const active = currentSong.id === id;
-
-    const handleMouseEnter = () => {
-        setIsMouseIn(true);
-    };
-
-    const handleMouseLeave = () => {
-        setIsMouseIn(false);
-    };
-
     const hostURL = "http://localhost:3000";
-
-    const addToFavHandler = () => {
-        const favlist = JSON.parse(localStorage.getItem("favoriteSongs")) || [];
-        const index = favlist.indexOf(id);
-        if (index > -1) {
-            favlist.splice(index, 1);
-        } else {
-            favlist.push(id);
-        }
-        setIsFave((prevFav) => !prevFav);
-        localStorage.setItem("favoriteSongs", JSON.stringify(favlist));
-    };
 
     const formatElemets = ["mp3", "m4a", "flac", "ogg"].map((item) => {
         if (item !== format) {
@@ -60,6 +39,7 @@ export default function MusicEntery({
                     key={item}
                     className="entry-menu-item"
                     onClick={() => {
+                        setIsMouseIn(false);
                         playerOptions.convertTo(address, name, item, hostURL);
                     }}
                 >
@@ -73,8 +53,12 @@ export default function MusicEntery({
         <>
             <div
                 className="entry-container"
-                onMouseOver={handleMouseEnter}
-                onMouseOut={handleMouseLeave}
+                onPointerEnter={() => {
+                    setIsMouseIn(true);
+                }}
+                onPointerLeave={() => {
+                    setIsMouseIn(false);
+                }}
                 style={{
                     backgroundColor: active && "rgb(43, 43, 45)",
                     border: active
@@ -151,13 +135,19 @@ export default function MusicEntery({
                     <Menu.Button
                         className="entry-menu-button"
                         style={{ opacity: isMouseIn ? 1 : 0 }}
+                        onClick={() => {
+                            setIsMouseIn(false);
+                        }}
                     >
                         <TfiMoreAlt />
                     </Menu.Button>
                     <Menu.Dropdown className="entry-menu-dropdown">
                         <Menu.Item
                             className="entry-menu-item"
-                            onClick={addToFavHandler}
+                            onClick={() => {
+                                playerOptions.favToggle(id);
+                                setIsFave((prevFav) => !prevFav);
+                            }}
                             style={{ color: "gold" }}
                         >
                             {isFave

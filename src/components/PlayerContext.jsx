@@ -275,7 +275,7 @@ export default function App({ children }) {
                 const percent = (currentTime / musicDuration) * 100;
                 setCurrentTimePercent(percent);
                 setCurrentTime(audio.currentTime);
-            }, 500);
+            }, 250);
         };
         const handleMetadata = () => {
             setDuration(audio.duration);
