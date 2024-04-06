@@ -4,29 +4,28 @@ import { PlayerContext } from "./PlayerContext";
 import { useContext, useState } from "react";
 import { BarLoader } from "react-spinners";
 import * as playerOptions from "../playerOptions";
+import React from "react";
 
-export default function Playlist({ togglePlaylistShow }) {
+function Playlist({ togglePlaylistShow }) {
     const { clearList, appendList, playlist } = useContext(PlayerContext);
     const [loadingList, setLoadingList] = useState(false);
-    const musicList = (list) => {
-        return list.map((song) => {
-            return (
-                <MusicEntery
-                    key={song.id}
-                    id={song.id}
-                    url={song.address}
-                    cover={song.cover}
-                    album={song.album}
-                    artist={song.artist}
-                    title={song.title}
-                    lyric={song.lyric ? true : false}
-                    format={song.format}
-                    address={song.address}
-                    name={song.name}
-                />
-            );
-        });
-    };
+    const musicList = playlist.map((song) => {
+        return (
+            <MusicEntery
+                key={song.id}
+                id={song.id}
+                url={song.address}
+                cover={song.cover}
+                album={song.album}
+                artist={song.artist}
+                title={song.title}
+                lyric={song.lyric ? true : false}
+                format={song.format}
+                address={song.address}
+                name={song.name}
+            />
+        );
+    });
 
     const Clear = () => {
         clearList();
@@ -65,7 +64,7 @@ export default function Playlist({ togglePlaylistShow }) {
                         Clear
                     </span>
                 </div>
-                {musicList(playlist)}
+                {musicList}
                 {loadingList && (
                     <div className="playlist-loading">
                         <BarLoader color="#36d7b7" />
@@ -78,3 +77,5 @@ export default function Playlist({ togglePlaylistShow }) {
         </>
     );
 }
+const MemoizedPlaylist = React.memo(Playlist);
+export default MemoizedPlaylist;

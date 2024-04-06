@@ -69,7 +69,7 @@ export const smartShuffle = (playlist, playTimes, currentSongId) => {
     return shuffledPlaylist;
 };
 
-const getSongDetail = async (file) => {
+const getSongDetailfromFile = async (file) => {
     try {
         const fileURL = URL.createObjectURL(file);
         const metadata = await mm.parseBlob(file);
@@ -98,19 +98,8 @@ const getSongDetail = async (file) => {
         };
         return list;
     } catch (e) {
-        if (
-            e.name === "SecurityError" &&
-            e.message.includes(
-                "A security issue was found and the operation was prevented"
-            )
-        ) {
-            console.error(
-                "Error: Unable to create URL for local file due to security restrictions."
-            );
-        } else {
-            console.log("Failed to Get Song Detail\n" + e.message);
-            throw new Error(e.message);
-        }
+        console.log("Failed to Get Song Detail\n" + e.message);
+        throw new Error(e.message);
     }
 };
 
@@ -152,51 +141,35 @@ const getLyricsFromFile = async (file) => {
 
 export const getSongListFromFiles = async (files) => {
     try {
-        const fileList = Array.from(files);
-        const musicDataPromises = fileList.map(async (file) => {
-            if (
-                file.name.endsWith(".mp3") ||
-                file.name.endsWith(".ogg") ||
-                file.name.endsWith(".m4a")
-            ) {
-                return await getSongDetail(file);
-            }
-            return null;
-        });
+        const fileList = [...files];
 
-        const lyricDataPromises = fileList.map(async (file) => {
-            if (file.name.endsWith(".lrc")) {
-                return await getLyricsFromFile(file);
-            }
-            return null;
-        });
+        const isMusic = (file) => /\.(mp3|ogg|m4a)$/.test(file.name);
+        const isLyric = (file) => /\.(lrc)$/.test(file.name);
 
-        //getting music data and lyric after that
-        const musicData = await Promise.all(musicDataPromises);
-        const lyricData = await Promise.all(lyricDataPromises);
+        const musicData = await fileList.reduce(async (accPromise, curr) => {
+            const acclumaitor = await accPromise;
+            const result = isMusic(curr)
+                ? await getSongDetailfromFile(curr)
+                : isLyric(curr)
+                ? await getLyricsFromFile(curr)
+                : null;
 
-        //filtering out empty items
-        const songList = [
-            ...musicData.filter(Boolean),
-            ...lyricData.filter(Boolean),
-        ];
-
-        //merging music and lyric with name of them
-        const mergedArray = {};
-        songList.forEach((item) => {
-            if (item !== null) {
-                if (mergedArray[item.name]) {
-                    Object.assign(mergedArray[item.name], item);
+            if (result) {
+                const index = acclumaitor.findIndex(
+                    (item) => item.name === result.name
+                );
+                if (index !== -1) {
+                    acclumaitor[index] = { ...acclumaitor[index], ...result };
                 } else {
-                    mergedArray[item.name] = item;
+                    acclumaitor.push(result);
                 }
             }
-        });
+            return acclumaitor;
+        }, []);
 
         //removing lyric only item
-        const filteredSongList = Object.values(mergedArray).filter(
-            (item) => item.id
-        );
+        const filteredSongList = [...musicData].filter((item) => item.id);
+
         return filteredSongList;
     } catch (e) {
         console.log("Failed to get Files from list");
@@ -293,101 +266,71 @@ const downloadFile = async (downloadLink, notifId, notifTitle) => {
 
 export const convertTo = async (sourceFile, name, targetFormat, host) => {
     const iconSize = 20;
-    const toastId = toast.loading("Uploading...");
-
+    const toastId = toastElement(name, "Uploading");
     try {
-        const response = await fetch(sourceFile);
-        const blob = await response.blob();
+        const response = await axios.get(sourceFile, { responseType: "blob" });
+        const formData = new FormData();
+        formData.append("file", response.data, name);
+        formData.append("format", targetFormat);
+        formData.append("name", name);
 
-        const form = new FormData();
-        form.append("file", blob, name);
-        form.append("format", targetFormat);
-        form.append("name", name);
+        const controller = new AbortController();
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${host}/convert`);
-
-        const cancelXhr = () => {
-            xhr.abort();
+        const cancelAxios = () => {
+            controller.abort();
             toast.error(toastElement(name, "Canceled"), {
                 id: toastId,
                 duration: 2000,
             });
         };
 
-        xhr.upload.onprogress = (e) => {
-            console.log(`${e.type}: ${e.loaded} bytes transferred\n`);
-            const progressPercent = Math.round((e.loaded / e.total) * 100);
-            toast.loading(
-                toastElement(
-                    name,
-                    progressPercent + "% Uploaded",
-                    <MdCancel size={iconSize} />,
-                    cancelXhr
-                ),
-                {
-                    id: toastId,
-                }
-            );
-            if (e.loaded == e.total) {
-                console.log("upload Finished");
+        const config = {
+            signal: controller.signal,
+            onUploadProgress: () => {
                 toast.loading(
                     toastElement(
                         name,
-                        `Coverting`,
+                        "Uploading",
                         <MdCancel size={iconSize} />,
-                        cancelXhr
+                        cancelAxios
                     ),
                     {
                         id: toastId,
+                        duration: Infinity,
                     }
                 );
+            },
+        };
+
+        const { data } = await axios.post(`${host}/convert`, formData, config);
+
+        const downloadLink = host + data.downloadUrl;
+        console.log(downloadLink);
+        toast.success(
+            toastElement(
+                name,
+                "Completed",
+                <IoCloudDownload size={iconSize} />,
+                () => {
+                    downloadFile(downloadLink, toastId, name);
+                }
+            ),
+            {
+                id: toastId,
+                duration: 20000,
             }
-        };
-
-        xhr.onloadend = () => {
-            const response = JSON.parse(xhr.response);
-            const downloadLink = host + response.downloadUrl;
-            console.log(downloadLink);
-            toast.success(
-                toastElement(
-                    name,
-                    "Completed",
-                    <IoCloudDownload size={iconSize} />,
-                    () => {
-                        downloadFile(downloadLink, toastId, name);
-                    }
-                ),
-                {
-                    id: toastId,
-                    duration: 20000,
-                }
-            );
-        };
-
-        xhr.onerror = () => {
-            toast.error(
-                toastElement(
-                    name,
-                    "Upload Failed",
-                    <RxCross1 size={iconSize * 0.75} />,
-                    () => {
-                        toast.dismiss(toastId);
-                    }
-                ),
-                {
-                    id: toastId,
-                }
-            );
-        };
-
-        xhr.send(form);
+        );
     } catch (error) {
+        if (axios.isCancel(error)) {
+            console.log("Request canceled", error.message);
+            return;
+        }
+
         toast.error(
             toastElement(
                 name,
                 "Upload Failed",
-                <RxCross1 size={iconSize} />,
+                <RxCross1 size={iconSize * 0.75} />,
                 () => {
                     toast.dismiss(toastId);
                 }
@@ -396,6 +339,5 @@ export const convertTo = async (sourceFile, name, targetFormat, host) => {
                 id: toastId,
             }
         );
-        console.error("Error uploading file:", error);
     }
 };
