@@ -30,7 +30,7 @@ export default function MusicEntery({
     } = useContext(PlayerContext);
 
     const active = currentSong.id === id;
-    const hostURL = "http://5.78.56.32";
+    const hostURL = "https://mptreeapi.filmsia.ir";
     // const hostURL = "http://localhost:3000";
 
     const formatElemets = ["mp3", "m4a", "flac", "ogg"].map((item) => {
